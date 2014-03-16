@@ -1,0 +1,61 @@
+<html>
+	<head>
+		<title>News Wall</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>
+            var websocket = new WebSocket('ws://localhost:8000/update');
+
+            websocket.onopen = function (evt) {};
+            websocket.onmessage = function (evt){
+
+                var c = $.parseJSON(evt.data)['content'];
+                var time = $.parseJSON(evt.data)['time'];
+                var txt = "<h3>" + time +"</h3>";
+                for(var i = 0; i < c.length; i++) {
+                    txt += "<ul><li>" + c[i].author + "</li>";
+                    txt += "<li>" + c[i].content + "</li>";
+                    txt += "<li>" + c[i].tool+ "</li></ul><br>"
+                }
+
+                var newNode = document.createElement("div");
+                newNode.innerHTML = txt;
+                document.getElementById("newContent").insertBefore(newNode, document.getElementById("newest"));
+                document.getElementById("newest").setAttribute("id", "old");
+                newNode.setAttribute("id", "newest");
+            };
+            websocket.onerror = function (evt) {};
+
+
+        </script>
+	</head>
+
+	<body>
+		<div>
+			<h1>新闻墙</h1>
+
+			<hr/>
+
+			<p><h2>当前新闻---{{ topic }}</h2></em></p>
+		</div>
+        <br>
+        <!--<input type="submit" value="刷新" id="refresh-button" /><br/>-->
+		<div>
+            <div id="newContent">
+                <div id="newest"></div>
+            </div>
+            <div>
+                <h3>{{ time }}</h3>
+                {% for v in data %}
+                <ul>
+                    <li>{{ v["author"] }}</li>
+                    <li>{{ v["content"] }}</li>
+                    <li>{{ v["tool"] }}</li>
+                </ul><br>
+                {% end%}
+            </div>
+
+		</div>
+        <!--<input type="submit" value="显示更早的微博" id="addmore-button" /><br/>-->
+	</body>
+</html>
